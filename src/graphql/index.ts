@@ -1,5 +1,5 @@
 import {ApolloServer, gql} from "apollo-server-lambda";
-import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
+import {ApolloServerPluginLandingPageGraphQLPlayground} from 'apollo-server-core';
 
 const typeDefs = gql`
     type Query {
