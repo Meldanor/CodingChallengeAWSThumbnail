@@ -5,6 +5,7 @@ import * as cdk from '@aws-cdk/core';
 import * as path from 'path';
 import * as sqs from '@aws-cdk/aws-sqs';
 import * as dynamodb from '@aws-cdk/aws-dynamodb';
+import * as apiGateway from '@aws-cdk/aws-apigateway';
 import {Duration} from "@aws-cdk/core";
 import { SqsEventSource } from '@aws-cdk/aws-lambda-event-sources';
 import {Queue} from "@aws-cdk/aws-sqs";
@@ -31,17 +32,11 @@ export class CodechallengeStack extends cdk.Stack {
 
     table.grantReadWriteData(thumbnailGeneratorLambda);
 
-    const deadLetterQueue = new Queue(this, "eventSequencingDLQueue", {
-      queueName: "dlq.fifo",
-      deliveryDelay: Duration.millis(0),
-      contentBasedDeduplication: true,
-      retentionPeriod: Duration.days(14),
-      fifo: true
+    const deadLetterQueue = new sqs.Queue(this, "eventSequencingDLQueue", {
+      retentionPeriod: Duration.days(14)
     });
 
     const queue = new sqs.Queue(this, 'MyQueue', {
-      visibilityTimeout: Duration.seconds(30),      // default,
-      receiveMessageWaitTime: Duration.seconds(20), // default,
       deadLetterQueue: {
         queue: deadLetterQueue,
         maxReceiveCount: 1
@@ -64,8 +59,18 @@ export class CodechallengeStack extends cdk.Stack {
     );
 
     thumbnailGeneratorLambda.addEventSource(new SqsEventSource(queue, {
-      batchSize: 10, // default
-      maxBatchingWindow: Duration.minutes(5),
+      batchSize: 10,
     }));
+
+    const graphqlLambda = new lambda.Function(this, 'graphqlLambda', {
+      // Where our function is located - in that case, in `lambda` directory at the root of our project
+      code: lambda.Code.fromAsset(path.join(__dirname, '/../src/graphql')),
+      handler: 'index.main',
+      runtime: lambda.Runtime.NODEJS_14_X,
+    });
+
+    new apiGateway.LambdaRestApi(this, 'graphqlEndpoint', {
+      handler: graphqlLambda,
+    });
   }
 }

@@ -9,7 +9,7 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "deploy": "build && cdk deploy",
+    "deploy": "tsc && cdk deploy",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint --fix . --ext .js,.jsx,.ts,.tsx"
   },
@@ -30,6 +30,8 @@
     "typescript": "~3.9.7"
   },
   "dependencies": {
+    "@aws-cdk/aws-apigateway": "1.134.0",
+    "@aws-cdk/aws-dynamodb": "1.134.0",
     "@aws-cdk/aws-lambda": "1.134.0",
     "@aws-cdk/aws-lambda-event-sources": "^1.134.0",
     "@aws-cdk/aws-s3": "1.134.0",
@@ -37,9 +39,9 @@
     "@aws-cdk/aws-sns": "1.134.0",
     "@aws-cdk/aws-sqs": "1.134.0",
     "@aws-cdk/core": "1.134.0",
-    "@aws-cdk/aws-dynamodb": "1.134.0",
-    "@aws-cdk/aws-apigatewayv2": "1.134.0",
+    "apollo-server-lambda": "^3.5.0",
     "aws-cdk": "1.134.0",
+    "graphql": "^15.7.2",
     "source-map-support": "^0.5.16"
   }
 }
